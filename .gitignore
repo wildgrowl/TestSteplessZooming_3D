@@ -4,3 +4,4 @@ client/.vs
 client/*.csproj
 client/client.sln
 client/obj
+client/*.suo
