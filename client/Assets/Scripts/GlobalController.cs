@@ -13,5 +13,8 @@ public static class GlobalController
     public static float CameraHeightLodRangeHigh = 80.0f;
     public static float CameraMaxHeight = 80.0f;
     public static float LODCameraHeightDelta = (CameraHeightLodRangeHigh - CameraHeightLodRangeLow) / LODLevelCount;
+
+    public static float OrthoCameraSizeRangeLow = 7.0f;
+    public static float OrthoCameraSizeRangeHigh = 100.0f;
     #endregion
 }

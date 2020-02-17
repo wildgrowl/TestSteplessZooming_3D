@@ -17,10 +17,19 @@ public enum ElementType
     BuildingElement = 1
 }
 
+/// <summary>
+/// 投影网格与unity单位的比例是1:1，
+/// 因此9x9的建筑就需要占据9x9 untiy单位的面积；
+/// Sprite的资源原始图宽度固定为：size / 根号2，
+/// 高度根据图片内容可变，
+/// 因此对于Sprite的缩放需要根据size实时计算。
+/// </summary>
+
 [ExecuteInEditMode]
 public class Element : MonoBehaviour
 {
-    public const float MeshSizeInUnity = 0.2f;
+    public const float MeshSizeInUnity = 1.0f;
+    private const float Sqrt2 = 1.414f;
 
     public ElementType m_type = ElementType.WorldElement;
     public int m_lodLevel = 0;
@@ -32,18 +41,15 @@ public class Element : MonoBehaviour
     public ScaleAnchor m_scaleAnchor = ScaleAnchor.BottomLeft;
 
     private float m_currentSize; // unity单位
+    private float m_currentSpriteCenterHeight;
     private float m_currentScale = 1.0f;
     private bool m_visible = true;
     private ZoomController m_zoomController;
 
-    public float CurSize
-    {
-        get { return m_currentSize; }
-    }
-
     void Start()
     {
         m_currentSize = m_size * MeshSizeInUnity * m_currentScale;
+        m_currentSpriteCenterHeight = GetComponentInChildren<SpriteRenderer>().size.y / 2 * m_currentScale;
         m_zoomController = GameObject.FindObjectOfType<ZoomController>();
     }
 
@@ -127,13 +133,18 @@ public class Element : MonoBehaviour
         transform.localScale = new Vector3(m_currentScale, m_currentScale, 1.0f);
 
         m_currentSize = m_size * m_currentScale * MeshSizeInUnity;
+        m_currentSpriteCenterHeight = GetComponentInChildren<SpriteRenderer>().size.y / 2 * m_currentScale;
 
         Vector3 oldPosition = transform.position;
-        transform.position = new Vector3(oldPosition.x, m_currentSize / 2, oldPosition.z);
+
+        transform.position = new Vector3(oldPosition.x, m_currentSpriteCenterHeight, oldPosition.z);
     }
 
-    public void TestUpdateCurrentSize()
+    public float TestUpdateCurrentSize()
     {
         m_currentSize = m_size * MeshSizeInUnity * m_currentScale;
+        m_currentSpriteCenterHeight = GetComponentInChildren<SpriteRenderer>().size.y / 2 * m_currentScale;
+
+        return m_currentSpriteCenterHeight;
     }
 }

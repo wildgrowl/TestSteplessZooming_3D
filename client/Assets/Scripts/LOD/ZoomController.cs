@@ -13,8 +13,10 @@ public class ZoomController : MonoBehaviour
     private bool m_is_double_finger = false;
     #endregion
 
+    public Camera m_orthoCamera;
     public int m_curLodLevel = 0;
     public float m_height = 12.0f;
+    public float m_orthoSize = 7.0f;
     public Vector3 m_targetPos;
 
     // Test
@@ -87,10 +89,12 @@ public class ZoomController : MonoBehaviour
         return vec;
     }
 
-    [ContextMenu("更新相机高度")]
+    [ContextMenu("更新相机高度/正交相机Size")]
     public void UpdateCameraPosition()
     {
         transform.position = m_targetPos + updateDeltaVector();
+        m_orthoSize = Mathf.Lerp(GlobalController.OrthoCameraSizeRangeLow, GlobalController.OrthoCameraSizeRangeHigh, m_height / (GlobalController.CameraHeightLodRangeHigh - GlobalController.CameraMinHeight));
+        m_orthoCamera.orthographicSize = m_orthoSize;
     }
 
     [ContextMenu("更新测试LodLevel")]
