@@ -1,0 +1,6 @@
+client/Library
+client/Temp
+client/.vs
+client/*.csproj
+client/client.sln
+client/obj
