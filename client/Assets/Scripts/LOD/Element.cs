@@ -18,17 +18,18 @@ public enum ElementType
 }
 
 /// <summary>
-/// 投影网格与unity单位的比例是1:1，
-/// 因此9x9的建筑就需要占据9x9 untiy单位的面积；
-/// Sprite的资源原始图宽度固定为：size / 根号2，
+/// 投影网格与unity单位的比例是2:1，
+/// 因此9x9的建筑就需要占据4.5x4.5 untiy单位的面积；
+/// Sprite的资源原始图宽度固定为：size / 根号2 * 比例，
 /// 高度根据图片内容可变，
-/// 因此对于Sprite的缩放需要根据size实时计算。
+/// 因此缩放时需要实时根据Sprite大小更新Sprite的高度，
+/// 以防止被地板裁切。
 /// </summary>
 
 [ExecuteInEditMode]
 public class Element : MonoBehaviour
 {
-    public const float MeshSizeInUnity = 1.0f;
+    public const float MeshSizeInUnity = 0.5f;
     private const float Sqrt2 = 1.414f;
 
     public ElementType m_type = ElementType.WorldElement;
@@ -38,6 +39,8 @@ public class Element : MonoBehaviour
     public float m_scaleMin = 1.0f;
     public float m_scaleMax = 2.0f;
     public int m_vanishLodLevel = -1;
+    public bool m_isBuildingPlant = false;
+    public bool m_isMainBuilding = false;
     public ScaleAnchor m_scaleAnchor = ScaleAnchor.BottomLeft;
 
     private float m_currentSize; // unity单位
@@ -45,12 +48,42 @@ public class Element : MonoBehaviour
     private float m_currentScale = 1.0f;
     private bool m_visible = true;
     private ZoomController m_zoomController;
+    private Nation m_myNation = null;
+
+    public float Size
+    {
+        get { return m_size; }
+    }
+
+    public float CurrentSize
+    {
+        get { return m_currentSize; }
+    }
+
+    public float CurrentScale
+    {
+        get { return m_currentScale; }
+    }
+
+    public float SpriteHeight
+    {
+        get { return m_currentSpriteCenterHeight; }
+    }
+
+    public bool Visible
+    {
+        get { return m_visible; }
+    }
 
     void Start()
     {
         m_currentSize = m_size * MeshSizeInUnity * m_currentScale;
         m_currentSpriteCenterHeight = GetComponentInChildren<SpriteRenderer>().size.y / 2 * m_currentScale;
         m_zoomController = GameObject.FindObjectOfType<ZoomController>();
+        if (transform.parent != null)
+        {
+            m_myNation = transform.parent.GetComponent<Nation>();
+        }
     }
 
     void Update()
@@ -63,6 +96,15 @@ public class Element : MonoBehaviour
     void CheckVisibleAndScale()
     {
         bool isVisible = false;
+        if (m_isBuildingPlant && m_myNation != null)
+        {
+            isVisible = m_myNation.IsAllElementsSettleDown;
+            if (m_visible != isVisible)
+                gameObject.GetComponentInChildren<SpriteRenderer>().enabled = isVisible;
+            m_visible = isVisible;
+            return;
+        }
+        
         int curLodLevel = m_zoomController.m_curLodLevel;
         if (m_lodLevel < curLodLevel)
         {
@@ -85,7 +127,7 @@ public class Element : MonoBehaviour
         }
 
         isVisible = true;
-        
+
         if (m_type == ElementType.WorldElement)
         {
             if (curLodLevel > 0)
@@ -95,18 +137,15 @@ public class Element : MonoBehaviour
         }
         else
         {
-            if (curLodLevel == 0)
+            if (curLodLevel == 0 || m_isMainBuilding)
             {
                 updateScaleSize();
-
-                // TODO. Update visible by checking area fighting.
             }
         }
 
         if (m_visible != isVisible)
             gameObject.GetComponentInChildren<SpriteRenderer>().enabled = isVisible;
         m_visible = isVisible;
-        //gameObject.SetActive(isVisible);
     }
 
     void updateScaleSize()
@@ -130,14 +169,33 @@ public class Element : MonoBehaviour
         percent = (curHeight - minHeight) / (maxHeight - minHeight);
 
         m_currentScale = Mathf.Lerp(m_scaleMin, m_scaleMax, percent);
-        transform.localScale = new Vector3(m_currentScale, m_currentScale, 1.0f);
+        transform.localScale = new Vector3(m_currentScale, m_currentScale, m_currentScale);
 
         m_currentSize = m_size * m_currentScale * MeshSizeInUnity;
         m_currentSpriteCenterHeight = GetComponentInChildren<SpriteRenderer>().size.y / 2 * m_currentScale;
 
         Vector3 oldPosition = transform.position;
-
         transform.position = new Vector3(oldPosition.x, m_currentSpriteCenterHeight, oldPosition.z);
+
+        // 更新Sprite Z坐标
+        if (m_type == ElementType.BuildingElement)
+        {
+            //Transform orthoCamera = GameObject.FindObjectOfType<ZoomController>().transform.GetChild(1);
+            //float rotation = orthoCamera.rotation.eulerAngles.x;
+            //float deltaZ = m_currentSpriteCenterHeight / Mathf.Tan(rotation) / 2;
+            //GetComponentInChildren<SpriteRenderer>().transform.localPosition = new Vector3(0, 0, -deltaZ);
+            float deltaZ = m_size * MeshSizeInUnity * Mathf.Sin(45 * Mathf.Deg2Rad) / 1;
+            GetComponentInChildren<SpriteRenderer>().transform.localPosition = new Vector3(0, 0, -deltaZ);
+        }
+    }
+
+    public void HideByAreaOverlap()
+    {
+        if (m_visible)
+        {
+            gameObject.GetComponentInChildren<SpriteRenderer>().enabled = false;
+            m_visible = false;
+        }
     }
 
     public float TestUpdateCurrentSize()

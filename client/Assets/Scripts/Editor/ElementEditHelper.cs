@@ -33,18 +33,18 @@ public static class ElementEditHelper
         Element[] elements = GameObject.FindObjectsOfType<Element>();
         foreach (var element in elements)
         {
-            GameObject plane = new GameObject();
-            
+            GameObject prefab = Resources.Load<GameObject>("Prefabs/ProjectionQuad");
+            GameObject plane = GameObject.Instantiate(prefab, element.transform);
         }
     }
 
     [MenuItem("Custom/删除投影面", false, 1)]
     public static void RemoveProjectionPlane()
     {
-        Element[] elements = GameObject.FindObjectsOfType<Element>();
-        foreach (var element in elements)
+        TestProjectionQuad[] planes = GameObject.FindObjectsOfType<TestProjectionQuad>();
+        foreach (var plane in planes)
         {
-            element.GetComponentInChildren<SpriteRenderer>().enabled = true;
+            GameObject.DestroyImmediate(plane.gameObject);
         }
     }
 }

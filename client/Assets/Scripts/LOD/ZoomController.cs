@@ -93,7 +93,9 @@ public class ZoomController : MonoBehaviour
     public void UpdateCameraPosition()
     {
         transform.position = m_targetPos + updateDeltaVector();
-        m_orthoSize = Mathf.Lerp(GlobalController.OrthoCameraSizeRangeLow, GlobalController.OrthoCameraSizeRangeHigh, m_height / (GlobalController.CameraHeightLodRangeHigh - GlobalController.CameraMinHeight));
+        float orthoRangeHigh = GlobalController.CameraMinHeight + GlobalController.LODCameraHeightDelta * 3;
+        float orthoRangeLow = GlobalController.CameraMinHeight;
+        m_orthoSize = Mathf.Lerp(GlobalController.OrthoCameraSizeRangeLow, GlobalController.OrthoCameraSizeRangeHigh, (m_height - orthoRangeLow) / (orthoRangeHigh  - orthoRangeLow));
         m_orthoCamera.orthographicSize = m_orthoSize;
     }
 
