@@ -27,7 +27,7 @@ public class TestProjectionQuad : MonoBehaviour
             transform.localScale = new Vector3(size, size, size);
             Vector3 parentPosition = element.transform.localPosition;
             //transform.localPosition = new Vector3(parentPosition.x, -height, parentPosition.z);
-            transform.position = new Vector3(parentPosition.x, 0.1f, parentPosition.z);
+            transform.position = new Vector3(parentPosition.x, 0.001f, parentPosition.z);
         }
     }
 }

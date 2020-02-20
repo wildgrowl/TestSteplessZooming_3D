@@ -152,21 +152,21 @@ public class Element : MonoBehaviour
     {
         float percent = 1.0f;
         int curLodLevel = m_zoomController.m_curLodLevel;
-        float curHeight = m_zoomController.m_height;
+        float curFov = Camera.main.fieldOfView;
 
-        float minHeight;
-        float maxHeight;
+        float minFov;
+        float maxFov;
         if (m_vanishLodLevel > 0)
         {
-            minHeight = GlobalController.CameraHeightLodRangeLow + (m_vanishLodLevel < 0 ? 0 : m_vanishLodLevel) * GlobalController.LODCameraHeightDelta;
+            minFov = GlobalController.CameraFovLodRangeLow + (m_vanishLodLevel < 0 ? 0 : m_vanishLodLevel) * GlobalController.CameraFovLodDelta;
         }
         else
         {
-            minHeight = GlobalController.CameraMinHeight;
+            minFov = GlobalController.CameraFovMin;
         }
-        maxHeight = GlobalController.CameraHeightLodRangeLow + m_lodLevel * GlobalController.LODCameraHeightDelta;
+        maxFov = GlobalController.CameraFovLodRangeLow + m_lodLevel * GlobalController.CameraFovLodDelta;
 
-        percent = (curHeight - minHeight) / (maxHeight - minHeight);
+        percent = (curFov - minFov) / (maxFov - minFov);
 
         m_currentScale = Mathf.Lerp(m_scaleMin, m_scaleMax, percent);
         transform.localScale = new Vector3(m_currentScale, m_currentScale, m_currentScale);

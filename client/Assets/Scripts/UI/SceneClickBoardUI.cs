@@ -25,9 +25,11 @@ public class SceneClickBoardUI : MonoBehaviour
         {
             Vector3 delta = eventData.delta * SCALE_FACTOR;
             Transform cameraCarrier = Camera.main.transform.parent;
-            ZoomController zoom = cameraCarrier.GetComponent<ZoomController>();
-            Vector3 oldTargetPos = zoom.m_targetPos;
-            zoom.m_targetPos = oldTargetPos - new Vector3(delta.x, 0, delta.y);
+            //ZoomController zoom = cameraCarrier.GetComponent<ZoomController>();
+            //Vector3 oldTargetPos = zoom.m_targetPos;
+            //zoom.m_targetPos = oldTargetPos - new Vector3(delta.x, 0, delta.y);
+            Vector3 oldPosition = cameraCarrier.transform.position;
+            cameraCarrier.transform.position = oldPosition + new Vector3(delta.x, 0, delta.y);
         }
     }
 }
