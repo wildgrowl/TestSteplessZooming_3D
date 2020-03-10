@@ -22,15 +22,30 @@ public class ZoomController : MonoBehaviour
     // Test
     public int TestCurrentLodLevel;
 
+    //void Update()
+    //{
+    //    float delta = processZoom();
+    //    m_height += delta;
+    //    m_height = Mathf.Clamp(m_height, GlobalController.CameraMinHeight, GlobalController.CameraMaxHeight);
+
+    //    UpdateCameraPosition();
+
+    //    m_curLodLevel = Mathf.FloorToInt((m_height - GlobalController.CameraHeightLodRangeLow) / GlobalController.LODCameraHeightDelta);
+    //    m_curLodLevel = Mathf.Clamp(m_curLodLevel, 0, GlobalController.LODLevelCount);
+
+    //    //float curPercent = (m_height - m_curLodLevel * GlobalController.LODCameraHeightDelta) / GlobalController.LODCameraHeightDelta;
+    //    //Debug.Log(string.Format("cur lod level = {0}, cur scale percent = {1}", m_curLodLevel, curPercent));
+    //}
+
     void Update()
     {
         float delta = processZoom();
-        m_height += delta;
-        m_height = Mathf.Clamp(m_height, GlobalController.CameraMinHeight, GlobalController.CameraMaxHeight);
+        float fov = Camera.main.fieldOfView;
+        fov += delta;
+        fov = Mathf.Clamp(fov, GlobalController.CameraFovMin, GlobalController.CameraFovLodRangeHigh);
+        Camera.main.fieldOfView = fov;
 
-        UpdateCameraPosition();
-
-        m_curLodLevel = Mathf.FloorToInt((m_height - GlobalController.CameraHeightLodRangeLow) / GlobalController.LODCameraHeightDelta);
+        m_curLodLevel = Mathf.FloorToInt((fov - GlobalController.CameraFovLodRangeLow) / GlobalController.CameraFovLodDelta);
         m_curLodLevel = Mathf.Clamp(m_curLodLevel, 0, GlobalController.LODLevelCount);
 
         //float curPercent = (m_height - m_curLodLevel * GlobalController.LODCameraHeightDelta) / GlobalController.LODCameraHeightDelta;

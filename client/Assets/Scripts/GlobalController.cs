@@ -16,5 +16,10 @@ public static class GlobalController
 
     public static float OrthoCameraSizeRangeLow = 7.0f;
     public static float OrthoCameraSizeRangeHigh = 100.0f;
+
+    public static float CameraFovMin = 4.0f;
+    public static float CameraFovLodRangeLow = 20.0f;
+    public static float CameraFovLodRangeHigh = 50.0f;
+    public static float CameraFovLodDelta = (CameraFovLodRangeHigh - CameraFovLodRangeLow) / LODLevelCount;
     #endregion
 }
