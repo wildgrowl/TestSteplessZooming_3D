@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Nation : MonoBehaviour
+public class City : MonoBehaviour
 {
     private Element[] m_elements;
     private int m_elementsCount;
@@ -43,7 +43,7 @@ public class Nation : MonoBehaviour
         }
         m_noScaleElementsCount = m_elementsCount - count;
     }
-    
+
     void updateProjectionAreaFighting()
     {
         m_hideElementsBuffer.Clear();
